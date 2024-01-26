@@ -3,15 +3,15 @@ const fs = require('fs');
 const readline = require('readline');
 const constants = require('fs');
 
-// const writeFile = function(filePath, data) { // function to write the URL page to a location on the local drive
-//   fs.writeFile(filePath, data, (err) => {
-//     if (err) {
-//       console.log("❌ Invalid filepath"); // if the file path isn't valid prints this message to the console
-//     } else {
-//       console.log(`✅ Downloaded and saved ${data.length} bytes to ${filePath}`); // prints the size and location of the downloaded page
-//     }
-//   });
-// };
+const writeFile = function(filePath, data) { // function to write the URL page to a location on the local drive
+  fs.writeFile(filePath, data, (err) => {
+    if (err) {
+      console.log("❌ Invalid filepath", err); // if the file path isn't valid prints this message to the console
+    } else {
+      console.log(`✅ Downloaded and saved ${data.length} bytes to ${filePath}`); // prints the size and location of the downloaded page
+    }
+  });
+};
 
 // const accessSaveLocation = function (filePath, body) {
 //   fs.access(filePath, constants.F_OK, (err) => {
@@ -39,12 +39,15 @@ const fetchFileFromServerTCP = function() {
   });
  
   conn.on("connect", () => {
+    let filePath = './downloaded_files/';
+
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
   
     rl.question("What file do you require? ", (answer) => {
+      filePath += answer;
       conn.write(`${answer}`);
       rl.close()
     });
@@ -52,8 +55,8 @@ const fetchFileFromServerTCP = function() {
     conn.setEncoding("utf8"); // interpret data as text
     
     conn.on("data", (data) => {
-      console.log(data);
-    //   let filePath = './file_downloads';
+
+      writeFile(filePath, data);
       
     //   const rl = readline.createInterface({
     //     input: process.stdin,
