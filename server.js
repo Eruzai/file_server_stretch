@@ -1,13 +1,18 @@
 const net = require("net");
+const fs = require('fs');
 
 const server = net.createServer();
 
 server.on("connection", (client) => {
   console.log("New client connected!");
-  client.write("Hello there!");
   client.setEncoding("utf8"); // interpret data as text
   client.on("data", (data) => {
-    console.log("Message from client: ", data);
+    fs.readFile(`./server_files/${data}`, (err, data) => {
+      if (err) {
+        client.write("There was an error: ", err);
+      }
+      client.write(data);
+    })
   });
 });
 
