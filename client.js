@@ -13,24 +13,24 @@ const writeFile = function(filePath, data) { // function to write the URL page t
   });
 };
 
-// const accessSaveLocation = function (filePath, body) {
-//   fs.access(filePath, constants.F_OK, (err) => {
-//     if (err) {
-//       writeFile(filePath, body); // if the path doesn't exist (the file doesn't exist) creates and writes to the file
-//     } else {
-//       const rl = readline.createInterface({
-//         input: process.stdin,
-//         output: process.stdout
-//       });
-//       rl.question("🛑 The file exists at this location! Hit enter to cancel or enter 'Y' to overwrite. ", (answer) => {
-//         if (answer.toUpperCase() === 'Y') { // if the file exists a prompt is generated to ask the user for direction
-//           writeFile(filePath, body);
-//         }
-//         rl.close();
-//       });
-//     }
-//   });
-// };
+const accessSaveLocation = function (filePath, body) {
+  fs.access(filePath, constants.F_OK, (err) => {
+    if (err) {
+      writeFile(filePath, body); // if the path doesn't exist (the file doesn't exist) creates and writes to the file
+    } else {
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      rl.question("🛑 The file exists at this location! Hit enter to cancel or enter 'Y' to overwrite. ", (answer) => {
+        if (answer.toUpperCase() === 'Y') { // if the file exists a prompt is generated to ask the user for direction
+          writeFile(filePath, body);
+        }
+        rl.close();
+      });
+    }
+  });
+};
 
 const fetchFileFromServerTCP = function() {
   const conn = net.createConnection({
@@ -40,14 +40,15 @@ const fetchFileFromServerTCP = function() {
  
   conn.on("connect", () => {
     let filePath = './downloaded_files/';
+    let requestedFile = null;
 
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
     });
   
-    rl.question("What file do you require? ", (answer) => {
-      filePath += answer;
+    rl.question("❓ What file do you require? ", (answer) => {
+      requestedFile = answer;
       conn.write(`${answer}`);
       rl.close()
     });
@@ -55,27 +56,25 @@ const fetchFileFromServerTCP = function() {
     conn.setEncoding("utf8"); // interpret data as text
     
     conn.on("data", (data) => {
-
-      writeFile(filePath, data);
       
-    //   const rl = readline.createInterface({
-    //     input: process.stdin,
-    //     output: process.stdout
-    //   });
+      const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
     
-    //   rl.question("Where would you like to save your file? Hit enter to accept default location (./file_downloads) ", (answer) => {
-    //     if (answer) {
-    //       filePath = answer;
-    //       rl.close();
-    //       accessSaveLocation(location, data);
-    //     } else {
-    //       rl.close();
-    //       accessSaveLocation(location, data);
-    //     }
-    //   });
+      rl.question("❓ Where would you like to save your file? Hit enter to accept default location (./file_downloads) ", (answer) => {
+        if (answer) {
+          filePath = answer + requestedFile;
+          rl.close();
+          accessSaveLocation(filePath, data);
+        } else {
+          filePath += requestedFile;
+          rl.close();
+          accessSaveLocation(filePath, data);
+        }
+      });
      });
   });
-
 };
 
 fetchFileFromServerTCP();
