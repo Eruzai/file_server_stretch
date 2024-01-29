@@ -13,11 +13,12 @@ server.on("connection", (client) => {
 
     fs.readFile(`./server_files/${data}`, (err, data) => {
       if (err) {
-        client.write("There was an error: ", err);
+        console.log("There was an error: ", err);
+      } else {
+        console.log("Found the data!");
+        client.write(data);
       }
-      console.log("Found the data!");
-      client.write(data);
-    })
+    });
   });
 });
 
