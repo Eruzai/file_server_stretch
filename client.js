@@ -13,7 +13,7 @@ const writeFile = function(filePath, data) { // function to write the URL page t
   });
 };
 
-const accessSaveLocation = function (filePath, body) {
+const accessSaveLocation = function(filePath, body) {
   fs.access(filePath, constants.F_OK, (err) => {
     if (err) {
       writeFile(filePath, body); // if the path doesn't exist (the file doesn't exist) creates and writes to the file
@@ -50,7 +50,7 @@ const fetchFileFromServerTCP = function() {
     rl.question("❓ What file do you require? ", (answer) => {
       requestedFile = answer;
       conn.write(`${answer}`);
-      rl.close()
+      rl.close();
     });
 
     conn.setEncoding("utf8"); // interpret data as text
@@ -73,7 +73,7 @@ const fetchFileFromServerTCP = function() {
           accessSaveLocation(filePath, data);
         }
       });
-     });
+    });
   });
 };
 
